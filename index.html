@@ -2,226 +2,175 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>JARVIS AI Command Center</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI Command Center – JARVIS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-/* ===== GLOBAL ===== */
+* { box-sizing: border-box; font-family: "Segoe UI", sans-serif; }
 body {
   margin: 0;
-  font-family: "Orbitron", system-ui, sans-serif;
-  background: radial-gradient(circle at top, #05131d, #000);
-  color: #00f6ff;
-  overflow-x: hidden;
+  background: radial-gradient(#02131a, #000);
+  color: #00ffff;
+  overflow: hidden;
 }
 
-h1, h2 {
-  text-transform: uppercase;
-  letter-spacing: 2px;
-}
-
-/* ===== HUD CONTAINER ===== */
-.container {
-  max-width: 1100px;
-  margin: auto;
-  padding: 40px 20px;
-}
-
-/* ===== HEADER ===== */
-.header {
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.header h1 {
-  font-size: 36px;
-  text-shadow: 0 0 20px #00f6ff;
-}
-
-/* ===== GLASS PANELS ===== */
-.panel {
-  background: linear-gradient(180deg, rgba(0,246,255,0.08), rgba(0,0,0,0.8));
-  border: 1px solid rgba(0,246,255,0.4);
-  box-shadow: 0 0 25px rgba(0,246,255,0.2);
-  padding: 20px;
-  margin-bottom: 30px;
-  position: relative;
-}
-
-.panel::before {
-  content: "";
-  position: absolute;
+/* BACKGROUND GRAPHICS */
+#bg {
+  position: fixed;
   inset: 0;
-  border: 1px dashed rgba(0,246,255,0.3);
-  pointer-events: none;
+  z-index: 0;
 }
 
-/* ===== MODULE LIST ===== */
+/* UI PANEL */
+#ui {
+  position: relative;
+  z-index: 2;
+  width: 85%;
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 20px;
+  border: 1px solid #00ffff55;
+  backdrop-filter: blur(8px);
+  background: #00131a88;
+}
+
+h1 {
+  text-align: center;
+  letter-spacing: 3px;
+}
+
+/* MODULES */
 .module {
   display: flex;
   justify-content: space-between;
-  padding: 12px 0;
-  border-bottom: 1px solid rgba(0,246,255,0.2);
+  padding: 10px;
+  border-bottom: 1px solid #00ffff22;
 }
 
-.locked {
-  opacity: 0.4;
+.locked { opacity: 0.3; }
+
+/* CHAT */
+#chat {
+  margin-top: 20px;
 }
 
-/* ===== CHAT ===== */
-.chat-box {
+#log {
+  height: 160px;
+  overflow-y: auto;
+  background: #000;
+  padding: 10px;
+  border: 1px solid #00ffff33;
+  font-size: 14px;
+}
+
+#inputRow {
   display: flex;
   margin-top: 10px;
 }
 
-.chat-box input {
+input {
   flex: 1;
-  padding: 12px;
   background: #000;
-  border: 1px solid #00f6ff;
-  color: #00f6ff;
-  font-family: inherit;
+  border: 1px solid #00ffff55;
+  color: #00ffff;
+  padding: 10px;
 }
 
-.chat-box button {
-  background: #00f6ff;
-  color: #000;
+button {
+  background: #00ffff;
   border: none;
-  padding: 12px 18px;
+  padding: 10px 20px;
   cursor: pointer;
   font-weight: bold;
 }
 
-#response {
-  margin-top: 15px;
-  min-height: 40px;
-}
-
-/* ===== HOLOGRAM ORB ===== */
-.orb {
-  width: 260px;
-  height: 260px;
-  border-radius: 50%;
-  margin: 40px auto 0;
-  border: 1px solid rgba(0,246,255,0.5);
-  box-shadow:
-    inset 0 0 30px rgba(0,246,255,0.6),
-    0 0 60px rgba(0,246,255,0.6);
-  animation: rotate 12s linear infinite;
-}
-
-@keyframes rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* ===== MOBILE ===== */
-@media (max-width: 600px) {
-  .header h1 { font-size: 24px; }
-}
+.error { color: #ff5555; }
+.jarvis { color: #00ffcc; }
+.user { color: #ffffff; }
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<canvas id="bg"></canvas>
 
-  <!-- HEADER -->
-  <div class="header">
-    <h1>AI Command Center</h1>
-    <p>Initializing JARVIS • Human–AI Interface Online</p>
-  </div>
+<div id="ui">
+  <h1>AI COMMAND CENTER</h1>
 
-  <!-- USER MEMORY -->
-  <div class="panel">
-    <h2>User Memory</h2>
-    <p>
-      You have joined the AI Evolution Program to master AI tools,
-      automation systems, and income architectures.
-    </p>
-  </div>
+  <div class="module"><span>AI Foundations</span><span>UNLOCKED</span></div>
+  <div class="module"><span>Prompt Engineering</span><span>UNLOCKED</span></div>
+  <div class="module locked"><span>Automation Systems</span><span>LOCKED</span></div>
+  <div class="module locked"><span>AI Business Models</span><span>LOCKED</span></div>
 
-  <!-- TRAINING MODULES -->
-  <div class="panel">
-    <h2>Training Modules</h2>
-
-    <div class="module">
-      <span>AI Foundations</span>
-      <span>UNLOCKED</span>
-    </div>
-
-    <div class="module">
-      <span>Prompt Engineering</span>
-      <span>UNLOCKED</span>
-    </div>
-
-    <div class="module locked">
-      <span>Automation Systems</span>
-      <span>LOCKED</span>
-    </div>
-
-    <div class="module locked">
-      <span>AI Business Models</span>
-      <span>LOCKED</span>
-    </div>
-
-    <div class="module locked">
-      <span>Scaling with AI</span>
-      <span>LOCKED</span>
+  <div id="chat">
+    <div id="log"></div>
+    <div id="inputRow">
+      <input id="msg" placeholder="Talk to JARVIS..." />
+      <button onclick="send()">ASK</button>
     </div>
   </div>
-
-  <!-- CHAT -->
-  <div class="panel">
-    <h2>Talk to JARVIS</h2>
-
-    <div class="chat-box">
-      <input id="userInput" placeholder="Speak your command..." />
-      <button onclick="talk()">ASK</button>
-    </div>
-
-    <div id="response">JARVIS: Standing by.</div>
-  </div>
-
-  <!-- HOLOGRAM -->
-  <div class="orb"></div>
-
 </div>
 
 <script>
-async function talk() {
-  const input = document.getElementById("userInput");
-  const responseBox = document.getElementById("response");
-  const message = input.value.trim();
+// SIMPLE BACKGROUND ANIMATION (NO THREE.JS BUGS)
+const canvas = document.getElementById("bg");
+const ctx = canvas.getContext("2d");
+resize();
+window.onresize = resize;
 
-  if (!message) return;
+let t = 0;
+function draw() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.strokeStyle = "#00ffff22";
+  for(let i=0;i<40;i++){
+    ctx.beginPath();
+    ctx.arc(canvas.width/2, canvas.height/2, i*15 + Math.sin(t+i)*10, 0, Math.PI*2);
+    ctx.stroke();
+  }
+  t += 0.01;
+  requestAnimationFrame(draw);
+}
+draw();
 
-  responseBox.innerText = "JARVIS: Processing...";
+function resize(){
+  canvas.width = innerWidth;
+  canvas.height = innerHeight;
+}
+
+// CHAT
+const log = document.getElementById("log");
+
+function add(text, cls){
+  const d = document.createElement("div");
+  d.className = cls;
+  d.innerText = text;
+  log.appendChild(d);
+  log.scrollTop = log.scrollHeight;
+}
+
+async function send(){
+  const input = document.getElementById("msg");
+  const text = input.value.trim();
+  if(!text) return;
+  input.value = "";
+
+  add("You: " + text, "user");
 
   try {
     const res = await fetch("/api/chat", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        message: message,
-        user: "Commander"
-      })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text })
     });
 
+    if(!res.ok) throw new Error("Server error");
+
     const data = await res.json();
+    add("JARVIS: " + data.reply, "jarvis");
 
-    if (!res.ok) throw new Error(data.error);
-
-    responseBox.innerText = "JARVIS: " + data.reply;
-
-  } catch (err) {
-    responseBox.innerText =
-      "JARVIS: Connection failed. Backend offline or API key missing.";
+  } catch (e) {
+    add("JARVIS: Connection error. Backend offline.", "error");
   }
-
-  input.value = "";
 }
 </script>
 
