@@ -1,92 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>JARVIS AI — Your Personal AI Mentor</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: radial-gradient(circle at center, #050d1a, #000);
-      color: #00eaff;
-      overflow: hidden;
-    }
+<meta charset="UTF-8">
+<title>JARVIS AI SYSTEM</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    .jarvis-core {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 260px;
-      height: 260px;
-      border-radius: 50%;
-      border: 3px solid #00eaff;
-      box-shadow: 0 0 40px #00eaff;
-      animation: pulse 2s infinite;
-    }
+<style>
+body {
+  margin: 0;
+  background: radial-gradient(circle, #061426, #000);
+  font-family: 'Segoe UI', Arial;
+  color: #00eaff;
+  height: 100vh;
+  overflow: hidden;
+}
 
-    @keyframes pulse {
-      0% { box-shadow: 0 0 20px #00eaff; }
-      50% { box-shadow: 0 0 60px #00eaff; }
-      100% { box-shadow: 0 0 20px #00eaff; }
-    }
+.core {
+  position: absolute;
+  top: 35%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 230px;
+  height: 230px;
+  border-radius: 50%;
+  border: 3px solid #00eaff;
+  box-shadow: 0 0 60px #00eaff;
+  animation: pulse 2.2s infinite;
+}
 
-    .chat-box {
-      position: absolute;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 90%;
-      max-width: 600px;
-    }
+@keyframes pulse {
+  0% { box-shadow: 0 0 20px #00eaff; }
+  50% { box-shadow: 0 0 90px #00eaff; }
+  100% { box-shadow: 0 0 20px #00eaff; }
+}
 
-    input {
-      width: 100%;
-      padding: 15px;
-      font-size: 16px;
-      background: #020b14;
-      border: 1px solid #00eaff;
-      color: #00eaff;
-      outline: none;
-    }
+#jarvisText {
+  position: absolute;
+  top: 62%;
+  width: 100%;
+  text-align: center;
+  font-size: 18px;
+  padding: 0 25px;
+  line-height: 1.6;
+}
 
-    .jarvis-text {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 18px;
-    }
+.chat {
+  position: absolute;
+  bottom: 30px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
 
-    button {
-      margin-top: 10px;
-      width: 100%;
-      padding: 12px;
-      background: #00eaff;
-      border: none;
-      font-size: 16px;
-      cursor: pointer;
-    }
-  </style>
+input {
+  width: 60%;
+  padding: 14px;
+  background: #020c18;
+  border: 1px solid #00eaff;
+  color: #00eaff;
+  font-size: 16px;
+}
+
+button {
+  padding: 14px 20px;
+  margin-left: 10px;
+  background: #00eaff;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+</style>
 </head>
 
 <body>
 
-  <div class="jarvis-core"></div>
+<div class="core"></div>
 
-  <div class="jarvis-text" id="jarvisText">
-    Initializing JARVIS AI… Awaiting user input.
-  </div>
+<div id="jarvisText">Booting JARVIS core...</div>
 
-  <div class="chat-box">
-    <input id="userInput" placeholder="Talk to JARVIS..." />
-    <button onclick="sendMessage()">ENGAGE</button>
-  </div>
+<div class="chat">
+  <input id="userInput" placeholder="Speak to JARVIS..." />
+  <button onclick="sendMessage()">SEND</button>
+</div>
 
 <script>
-function sendMessage() {
-  const input = document.getElementById("userInput").value;
-  document.getElementById("jarvisText").innerText =
-    "Processing… Analyzing your intent, " + input;
+/* ==========================
+   JARVIS MASTER SALES SYSTEM
+   ========================== */
+
+let step = 0;
+let accessGranted = false;
+
+const flow = [
+`Hello.
+I am JARVIS.
+
+I analyze humans who seek advantage.
+Tell me — what do you do professionally?`,
+
+`Noted.
+
+Why are you here?
+More income, freedom, or control over time?`,
+
+`Most people fail because they consume information.
+Very few build systems.
+
+AI rewards builders, not watchers.`,
+
+`I operate a structured AI learning protocol.
+Designed to convert skill into income.`,
+
+`This is not YouTube knowledge.
+This is execution-grade intelligence.`,
+
+`If you want access,
+say clearly: "Activate my access"`,
+
+`Authorization required.
+Redirecting to payment gateway.`
+];
+
+function speak(text) {
+  const msg = new SpeechSynthesisUtterance(text);
+  msg.rate = 0.88;
+  msg.pitch = 0.55;
+  msg.voice = speechSynthesis.getVoices()[0];
+  speechSynthesis.speak(msg);
 }
+
+function sendMessage() {
+  const input = document.getElementById("userInput").value.toLowerCase();
+  const output = document.getElementById("jarvisText");
+
+  if (input.includes("activate my access")) {
+    output.innerText = "Access protocol initiated. Authorization required.";
+    speak(output.innerText);
+
+    setTimeout(() => {
+      window.location.href = "https://rzp.io/l/YOUR_RAZORPAY_LINK";
+    }, 2000);
+    return;
+  }
+
+  if (step < flow.length) {
+    output.innerText = flow[step];
+    speak(flow[step]);
+    step++;
+  }
+
+  document.getElementById("userInput").value = "";
+}
+
+/* ======= ACCESS CHECK (POST PAYMENT) =======
+   After payment success, redirect users to:
+   yoursite.com/?access=granted
+=========================================== */
+
+window.onload = () => {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("access") === "granted") {
+    accessGranted = true;
+    document.getElementById("jarvisText").innerText =
+    "Access granted. Welcome to the AI command center.";
+    speak("Access granted. Welcome.");
+    return;
+  }
+
+  document.getElementById("jarvisText").innerText = flow[0];
+  speak(flow[0]);
+  step = 1;
+};
 </script>
 
 </body>
