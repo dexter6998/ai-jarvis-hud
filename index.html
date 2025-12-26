@@ -2,175 +2,246 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>JARVIS AI SYSTEM</title>
+<title>JARVIS AI | Command Center</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!-- Razorpay -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
 <style>
-body {
-  margin: 0;
-  background: radial-gradient(circle, #061426, #000);
-  font-family: 'Segoe UI', Arial;
-  color: #00eaff;
-  height: 100vh;
-  overflow: hidden;
+html,body{
+  margin:0;
+  padding:0;
+  height:100%;
+  background:#000;
+  font-family:Segoe UI,Arial;
+  color:#7ffcff;
+  overflow:hidden;
 }
 
-.core {
-  position: absolute;
-  top: 35%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 230px;
-  height: 230px;
-  border-radius: 50%;
-  border: 3px solid #00eaff;
-  box-shadow: 0 0 60px #00eaff;
-  animation: pulse 2.2s infinite;
+/* BACKGROUND */
+#bg{
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(circle at center,#0b2f45,#000 70%);
 }
 
-@keyframes pulse {
-  0% { box-shadow: 0 0 20px #00eaff; }
-  50% { box-shadow: 0 0 90px #00eaff; }
-  100% { box-shadow: 0 0 20px #00eaff; }
+/* AI CORE */
+#core{
+  position:absolute;
+  top:30%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:220px;
+  height:220px;
+  border-radius:50%;
+  border:2px solid #00f6ff;
+  animation:pulse 2.5s infinite;
+  box-shadow:0 0 100px #00f6ff;
 }
 
-#jarvisText {
-  position: absolute;
-  top: 62%;
-  width: 100%;
-  text-align: center;
-  font-size: 18px;
-  padding: 0 25px;
-  line-height: 1.6;
+/* RADAR */
+#radar{
+  position:absolute;
+  width:300px;
+  height:300px;
+  border:1px dashed #00f6ff44;
+  border-radius:50%;
+  animation:spin 8s linear infinite;
+  top:30%;
+  left:50%;
+  transform:translate(-50%,-50%);
 }
 
-.chat {
-  position: absolute;
-  bottom: 30px;
-  width: 100%;
-  display: flex;
-  justify-content: center;
+@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+@keyframes pulse{
+  0%{box-shadow:0 0 30px #00f6ff}
+  50%{box-shadow:0 0 140px #00f6ff}
+  100%{box-shadow:0 0 30px #00f6ff}
 }
 
-input {
-  width: 60%;
-  padding: 14px;
-  background: #020c18;
-  border: 1px solid #00eaff;
-  color: #00eaff;
-  font-size: 16px;
+/* HUD TEXT */
+#hud{
+  position:absolute;
+  top:55%;
+  width:100%;
+  text-align:center;
+  font-size:18px;
+  padding:0 30px;
 }
 
-button {
-  padding: 14px 20px;
-  margin-left: 10px;
-  background: #00eaff;
-  border: none;
-  font-size: 16px;
-  cursor: pointer;
+/* INPUT */
+#inputArea{
+  position:absolute;
+  bottom:20px;
+  width:100%;
+  display:flex;
+  justify-content:center;
+}
+
+input{
+  width:60%;
+  padding:14px;
+  background:#020c14;
+  border:1px solid #00f6ff;
+  color:#7ffcff;
+}
+
+button{
+  margin-left:10px;
+  padding:14px 20px;
+  background:#00f6ff;
+  border:none;
+  cursor:pointer;
+}
+
+/* DASHBOARD */
+#dashboard{
+  display:none;
+  position:absolute;
+  inset:0;
+  padding:40px;
+}
+
+.card{
+  border:1px solid #00f6ff;
+  padding:20px;
+  margin:20px 0;
+  box-shadow:0 0 30px #00f6ff33;
+}
+
+/* LOCK */
+.lock{
+  opacity:.4;
+  pointer-events:none;
 }
 </style>
 </head>
 
 <body>
 
-<div class="core"></div>
+<div id="bg"></div>
+<div id="radar"></div>
+<div id="core"></div>
 
-<div id="jarvisText">Booting JARVIS core...</div>
+<div id="hud">Initializing AI Core…</div>
 
-<div class="chat">
-  <input id="userInput" placeholder="Speak to JARVIS..." />
-  <button onclick="sendMessage()">SEND</button>
+<div id="inputArea">
+  <input id="userInput" placeholder="Speak to JARVIS…" />
+  <button onclick="next()">SEND</button>
+</div>
+
+<div id="dashboard">
+  <h2>AI COMMAND CENTER</h2>
+
+  <div class="card lock" id="course1">
+    <h3>AI Foundations</h3>
+    <p>Prompting • ChatGPT • Automation</p>
+  </div>
+
+  <div class="card lock" id="course2">
+    <h3>AI for Professionals</h3>
+    <p>Marketing • Design • Coding</p>
+  </div>
+
+  <button onclick="pay()">UNLOCK FULL ACCESS</button>
+
+  <div class="card">
+    <h3>Talk to JARVIS</h3>
+    <input id="chatInput" placeholder="Ask anything…" />
+    <button onclick="chat()">ASK</button>
+    <p id="chatReply"></p>
+  </div>
 </div>
 
 <script>
-/* ==========================
-   JARVIS MASTER SALES SYSTEM
-   ========================== */
+/* MEMORY */
+let user = localStorage.getItem("jarvis_user");
+let paid = localStorage.getItem("jarvis_paid");
 
-let step = 0;
-let accessGranted = false;
+/* VOICE */
+function speak(t){
+  const u=new SpeechSynthesisUtterance(t);
+  u.rate=.85;u.pitch=.6;
+  speechSynthesis.speak(u);
+}
 
-const flow = [
-`Hello.
-I am JARVIS.
-
-I analyze humans who seek advantage.
-Tell me — what do you do professionally?`,
-
-`Noted.
-
-Why are you here?
-More income, freedom, or control over time?`,
-
-`Most people fail because they consume information.
-Very few build systems.
-
-AI rewards builders, not watchers.`,
-
-`I operate a structured AI learning protocol.
-Designed to convert skill into income.`,
-
-`This is not YouTube knowledge.
-This is execution-grade intelligence.`,
-
-`If you want access,
-say clearly: "Activate my access"`,
-
-`Authorization required.
-Redirecting to payment gateway.`
+/* SCRIPT */
+let step=0;
+const intro=[
+"I am JARVIS.",
+"This system accelerates human intelligence.",
+"State your name to continue."
 ];
 
-function speak(text) {
-  const msg = new SpeechSynthesisUtterance(text);
-  msg.rate = 0.88;
-  msg.pitch = 0.55;
-  msg.voice = speechSynthesis.getVoices()[0];
-  speechSynthesis.speak(msg);
-}
-
-function sendMessage() {
-  const input = document.getElementById("userInput").value.toLowerCase();
-  const output = document.getElementById("jarvisText");
-
-  if (input.includes("activate my access")) {
-    output.innerText = "Access protocol initiated. Authorization required.";
-    speak(output.innerText);
-
-    setTimeout(() => {
-      window.location.href = "https://rzp.io/l/YOUR_RAZORPAY_LINK";
-    }, 2000);
+function next(){
+  const input=userInput.value;
+  if(!user && step===2){
+    user=input;
+    localStorage.setItem("jarvis_user",user);
+    speak(`Welcome ${user}.`);
+    bootDashboard();
     return;
   }
-
-  if (step < flow.length) {
-    output.innerText = flow[step];
-    speak(flow[step]);
-    step++;
-  }
-
-  document.getElementById("userInput").value = "";
+  hud.innerText=intro[step];
+  speak(intro[step]);
+  step++;
+  userInput.value="";
 }
 
-/* ======= ACCESS CHECK (POST PAYMENT) =======
-   After payment success, redirect users to:
-   yoursite.com/?access=granted
-=========================================== */
+/* DASHBOARD */
+function bootDashboard(){
+  setTimeout(()=>{
+    core.style.display="none";
+    radar.style.display="none";
+    hud.style.display="none";
+    inputArea.style.display="none";
+    dashboard.style.display="block";
+    speak(`Command Center online, ${user}.`);
+    if(paid) unlock();
+  },1500);
+}
 
-window.onload = () => {
-  const params = new URLSearchParams(window.location.search);
-  if (params.get("access") === "granted") {
-    accessGranted = true;
-    document.getElementById("jarvisText").innerText =
-    "Access granted. Welcome to the AI command center.";
-    speak("Access granted. Welcome.");
-    return;
+/* PAYMENT */
+function pay(){
+  var options={
+    key:"RAZORPAY_KEY_HERE",
+    amount:199900,
+    currency:"INR",
+    name:"JARVIS AI",
+    handler:function(){
+      localStorage.setItem("jarvis_paid","yes");
+      unlock();
+      speak("Access granted. Evolution begins.");
+    }
+  };
+  new Razorpay(options).open();
+}
+
+function unlock(){
+  course1.classList.remove("lock");
+  course2.classList.remove("lock");
+}
+
+/* AI CHAT (BACKEND READY) */
+async function chat(){
+  chatReply.innerText="Processing…";
+  // Replace URL with your backend later
+  chatReply.innerText="JARVIS: I am ready to guide your evolution.";
+  speak(chatReply.innerText);
+}
+
+/* AUTO BOOT */
+window.onload=()=>{
+  if(user){
+    bootDashboard();
+  }else{
+    hud.innerText=intro[0];
+    speak(intro[0]);
+    step=1;
   }
-
-  document.getElementById("jarvisText").innerText = flow[0];
-  speak(flow[0]);
-  step = 1;
-};
+}
 </script>
 
 </body>
