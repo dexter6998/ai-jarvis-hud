@@ -2,246 +2,233 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>JARVIS AI | Command Center</title>
+<title>JARVIS AI Command Center</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- Razorpay -->
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<!-- Three.js -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.158/build/three.min.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
-html,body{
-  margin:0;
-  padding:0;
-  height:100%;
-  background:#000;
-  font-family:Segoe UI,Arial;
-  color:#7ffcff;
+:root{
+  --cyan:#00ffff;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Orbitron}
+body{
+  background:radial-gradient(circle at center,#03141c,#000);
+  color:var(--cyan);
   overflow:hidden;
 }
 
-/* BACKGROUND */
-#bg{
-  position:fixed;
-  inset:0;
-  background:
-    radial-gradient(circle at center,#0b2f45,#000 70%);
-}
-
-/* AI CORE */
-#core{
-  position:absolute;
-  top:30%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  width:220px;
-  height:220px;
-  border-radius:50%;
-  border:2px solid #00f6ff;
-  animation:pulse 2.5s infinite;
-  box-shadow:0 0 100px #00f6ff;
-}
-
-/* RADAR */
-#radar{
-  position:absolute;
-  width:300px;
-  height:300px;
-  border:1px dashed #00f6ff44;
-  border-radius:50%;
-  animation:spin 8s linear infinite;
-  top:30%;
-  left:50%;
-  transform:translate(-50%,-50%);
-}
-
-@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
-@keyframes pulse{
-  0%{box-shadow:0 0 30px #00f6ff}
-  50%{box-shadow:0 0 140px #00f6ff}
-  100%{box-shadow:0 0 30px #00f6ff}
-}
-
-/* HUD TEXT */
+/* HUD */
 #hud{
-  position:absolute;
-  top:55%;
-  width:100%;
-  text-align:center;
-  font-size:18px;
-  padding:0 30px;
+  position:fixed;inset:0;
+  background:
+    radial-gradient(circle at center,rgba(0,255,255,.15),transparent 65%),
+    repeating-linear-gradient(0deg,rgba(0,255,255,.04),rgba(0,255,255,.04) 1px,transparent 1px,transparent 40px);
+  z-index:-10;
 }
 
-/* INPUT */
-#inputArea{
-  position:absolute;
-  bottom:20px;
-  width:100%;
-  display:flex;
-  justify-content:center;
-}
+/* 3D */
+#three{position:fixed;inset:0;z-index:-5}
 
-input{
-  width:60%;
-  padding:14px;
-  background:#020c14;
-  border:1px solid #00f6ff;
-  color:#7ffcff;
+/* LOGIN */
+#login{
+  position:fixed;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.9);
 }
-
-button{
-  margin-left:10px;
-  padding:14px 20px;
-  background:#00f6ff;
-  border:none;
+.login-box{
+  width:320px;padding:30px;
+  border:1px solid var(--cyan);
+  backdrop-filter:blur(20px);
+  box-shadow:0 0 40px rgba(0,255,255,.3);
+}
+.login-box h2{text-align:center;margin-bottom:20px}
+.login-box input{
+  width:100%;padding:12px;
+  background:#000;border:1px solid var(--cyan);
+  color:var(--cyan);
+}
+.login-box button{
+  margin-top:20px;width:100%;
+  padding:12px;border:none;
+  background:var(--cyan);color:#000;
   cursor:pointer;
 }
 
 /* DASHBOARD */
-#dashboard{
-  display:none;
-  position:absolute;
-  inset:0;
-  padding:40px;
-}
-
+#dash{display:none;height:100vh;overflow:auto;padding:20px}
+h1{text-align:center;text-shadow:0 0 20px var(--cyan)}
 .card{
-  border:1px solid #00f6ff;
-  padding:20px;
-  margin:20px 0;
-  box-shadow:0 0 30px #00f6ff33;
+  max-width:900px;margin:20px auto;padding:20px;
+  background:rgba(0,20,30,.6);
+  border:1px solid rgba(0,255,255,.5);
+  backdrop-filter:blur(16px);
+  box-shadow:0 0 30px rgba(0,255,255,.2);
 }
 
-/* LOCK */
-.lock{
-  opacity:.4;
-  pointer-events:none;
+/* MODULES */
+.module{
+  display:flex;justify-content:space-between;
+  padding:12px 0;border-bottom:1px solid rgba(0,255,255,.25);
+  opacity:.35
+}
+.module.unlocked{opacity:1}
+
+/* CHAT */
+#chat{display:flex;margin-top:15px}
+#chat input{
+  flex:1;padding:12px;
+  background:#000;border:1px solid var(--cyan);
+  color:var(--cyan);
+}
+#chat button{
+  padding:12px;background:var(--cyan);
+  border:none;
+}
+
+#avatar-label{
+  position:fixed;bottom:20px;right:20px;
+  font-size:12px;opacity:.7;
 }
 </style>
 </head>
 
 <body>
 
-<div id="bg"></div>
-<div id="radar"></div>
-<div id="core"></div>
+<div id="hud"></div>
+<div id="three"></div>
+<div id="avatar-label">JARVIS ONLINE</div>
 
-<div id="hud">Initializing AI Core…</div>
-
-<div id="inputArea">
-  <input id="userInput" placeholder="Speak to JARVIS…" />
-  <button onclick="next()">SEND</button>
+<!-- LOGIN -->
+<div id="login">
+  <div class="login-box">
+    <h2>INITIALIZE JARVIS</h2>
+    <input id="username" placeholder="Your Name">
+    <button onclick="activate()">ACTIVATE</button>
+  </div>
 </div>
 
-<div id="dashboard">
-  <h2>AI COMMAND CENTER</h2>
+<!-- DASHBOARD -->
+<div id="dash">
+<h1>AI COMMAND CENTER</h1>
 
-  <div class="card lock" id="course1">
-    <h3>AI Foundations</h3>
-    <p>Prompting • ChatGPT • Automation</p>
-  </div>
+<div class="card">
+<h3>User Memory</h3>
+<p id="memory"></p>
+</div>
 
-  <div class="card lock" id="course2">
-    <h3>AI for Professionals</h3>
-    <p>Marketing • Design • Coding</p>
-  </div>
+<div class="card">
+<h3>Training Modules</h3>
+<div id="modules"></div>
+</div>
 
-  <button onclick="pay()">UNLOCK FULL ACCESS</button>
-
-  <div class="card">
-    <h3>Talk to JARVIS</h3>
-    <input id="chatInput" placeholder="Ask anything…" />
-    <button onclick="chat()">ASK</button>
-    <p id="chatReply"></p>
-  </div>
+<div class="card">
+<h3>Talk to JARVIS</h3>
+<div id="chat">
+<input id="q" placeholder="Ask anything about AI, business, or automation…">
+<button onclick="ask()">ASK</button>
+</div>
+<p id="a"></p>
+</div>
 </div>
 
 <script>
-/* MEMORY */
-let user = localStorage.getItem("jarvis_user");
-let paid = localStorage.getItem("jarvis_paid");
-
-/* VOICE */
-function speak(t){
-  const u=new SpeechSynthesisUtterance(t);
-  u.rate=.85;u.pitch=.6;
-  speechSynthesis.speak(u);
+/* LOGIN + MEMORY */
+function activate(){
+  const n=username.value.trim();
+  if(!n) return;
+  localStorage.setItem("user",n);
+  localStorage.setItem(
+    "memory",
+    "User joined the AI evolution program to master AI tools, automation, and income systems."
+  );
+  login.style.display="none";
+  dash.style.display="block";
+  memory.innerText=localStorage.getItem("memory");
 }
+</script>
 
-/* SCRIPT */
-let step=0;
-const intro=[
-"I am JARVIS.",
-"This system accelerates human intelligence.",
-"State your name to continue."
+<script>
+/* MODULES */
+const modulesData=[
+ "AI Foundations",
+ "Prompt Engineering",
+ "Automation Systems",
+ "AI Business Models",
+ "Scaling with AI"
 ];
+modules.innerHTML=modulesData.map((m,i)=>
+ `<div class="module ${i<2?'unlocked':''}">
+   <span>${m}</span>
+   <span>${i<2?'UNLOCKED':'LOCKED'}</span>
+ </div>`).join("");
+</script>
 
-function next(){
-  const input=userInput.value;
-  if(!user && step===2){
-    user=input;
-    localStorage.setItem("jarvis_user",user);
-    speak(`Welcome ${user}.`);
-    bootDashboard();
-    return;
-  }
-  hud.innerText=intro[step];
-  speak(intro[step]);
-  step++;
-  userInput.value="";
-}
+<script>
+/* REAL GPT CHAT */
+async function ask(){
+  const question=q.value.trim();
+  if(!question) return;
 
-/* DASHBOARD */
-function bootDashboard(){
-  setTimeout(()=>{
-    core.style.display="none";
-    radar.style.display="none";
-    hud.style.display="none";
-    inputArea.style.display="none";
-    dashboard.style.display="block";
-    speak(`Command Center online, ${user}.`);
-    if(paid) unlock();
-  },1500);
-}
+  a.innerText="JARVIS: Analyzing...";
+  const user=localStorage.getItem("user")||"Operator";
 
-/* PAYMENT */
-function pay(){
-  var options={
-    key:"RAZORPAY_KEY_HERE",
-    amount:199900,
-    currency:"INR",
-    name:"JARVIS AI",
-    handler:function(){
-      localStorage.setItem("jarvis_paid","yes");
-      unlock();
-      speak("Access granted. Evolution begins.");
-    }
-  };
-  new Razorpay(options).open();
-}
-
-function unlock(){
-  course1.classList.remove("lock");
-  course2.classList.remove("lock");
-}
-
-/* AI CHAT (BACKEND READY) */
-async function chat(){
-  chatReply.innerText="Processing…";
-  // Replace URL with your backend later
-  chatReply.innerText="JARVIS: I am ready to guide your evolution.";
-  speak(chatReply.innerText);
-}
-
-/* AUTO BOOT */
-window.onload=()=>{
-  if(user){
-    bootDashboard();
-  }else{
-    hud.innerText=intro[0];
-    speak(intro[0]);
-    step=1;
+  try{
+    const res=await fetch("/api/chat",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({message:question,user})
+    });
+    const data=await res.json();
+    a.innerText="JARVIS: "+data.reply;
+  }catch{
+    a.innerText="JARVIS: Connection error.";
   }
 }
+</script>
+
+<script>
+/* THREE.JS — AI CORE + AVATAR */
+const scene=new THREE.Scene();
+const cam=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,0.1,100);
+cam.position.z=5;
+
+const renderer=new THREE.WebGLRenderer({alpha:true});
+renderer.setSize(innerWidth,innerHeight);
+document.getElementById("three").appendChild(renderer.domElement);
+
+/* CORE */
+const core=new THREE.Mesh(
+  new THREE.IcosahedronGeometry(1.2,2),
+  new THREE.MeshBasicMaterial({wireframe:true,color:0x00ffff})
+);
+scene.add(core);
+
+/* AVATAR */
+const avatar=new THREE.Mesh(
+  new THREE.SphereGeometry(0.6,32,32),
+  new THREE.MeshBasicMaterial({wireframe:true,color:0x00ffff})
+);
+avatar.position.set(2,-1,0);
+scene.add(avatar);
+
+/* ANIMATE */
+function animate(){
+  requestAnimationFrame(animate);
+  core.rotation.y+=0.002;
+  avatar.rotation.y-=0.003;
+  renderer.render(scene,cam);
+}
+animate();
+
+addEventListener("resize",()=>{
+  cam.aspect=innerWidth/innerHeight;
+  cam.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+});
 </script>
 
 </body>
