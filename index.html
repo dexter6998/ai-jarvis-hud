@@ -2,217 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>AI Command Center</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
-
-<style>
-html, body {
-  margin: 0;
-  padding: 0;
-  background: #000;
-  font-family: Orbitron, sans-serif;
-  overflow: hidden;
-  color: #00ffff;
-}
-
-#threeCanvas {
-  position: fixed;
-  inset: 0;
-  z-index: 1;
-}
-
-.hud {
-  position: relative;
-  z-index: 5;
-  width: 90%;
-  max-width: 900px;
-  margin: 40px auto;
-  padding: 20px;
-  border: 1px solid #00ffff;
-  background: rgba(0,0,0,0.55);
-  box-shadow: 0 0 30px rgba(0,255,255,0.5);
-  backdrop-filter: blur(10px);
-}
-
-h1 {
-  text-align: center;
-  letter-spacing: 4px;
-}
-
-.panel {
-  border: 1px solid #00ffff;
-  padding: 15px;
-  margin-bottom: 15px;
-}
-
-input {
-  width: 75%;
-  padding: 10px;
-  background: black;
-  border: 1px solid #00ffff;
-  color: #00ffff;
-}
-
-button {
-  padding: 10px 20px;
-  background: #00ffff;
-  color: black;
-  border: none;
-  cursor: pointer;
-  margin-left: 10px;
-}
-
-.scanlines::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background: repeating-linear-gradient(
-    to bottom,
-    rgba(0,255,255,0.04),
-    rgba(0,255,255,0.04) 1px,
-    transparent 1px,
-    transparent 3px
-  );
-  pointer-events: none;
-  z-index: 4;
-}
-</style>
-</head>
-
-<body class="scanlines">
-
-<canvas id="threeCanvas"></canvas>
-
-<div class="hud">
-  <h1>AI COMMAND CENTER</h1>
-
-  <div class="panel">
-    Evolution Program: ACTIVE<br>
-    Interactions: 2
-  </div>
-
-  <div class="panel">
-    AI Foundations — UNLOCKED<br>
-    Prompt Engineering — UNLOCKED<br>
-    Automation Systems — LOCKED
-  </div>
-
-  <div class="panel">
-    Talk to JARVIS<br><br>
-    <input placeholder="Speak or type command">
-    <button>ASK</button>
-    <div style="margin-top:10px;font-size:13px;">JARVIS: Online.</div>
-  </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
-
-<script>
-const canvas = document.getElementById("threeCanvas");
-const scene = new THREE.Scene();
-
-const camera = new THREE.PerspectiveCamera(
-  50,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  1000
-);
-camera.position.z = 70;
-
-const renderer = new THREE.WebGLRenderer({
-  canvas,
-  alpha: true,
-  antialias: true
-});
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(window.devicePixelRatio);
-
-// PARTICLE AVATAR
-const geometry = new THREE.BufferGeometry();
-const positions = [];
-const velocities = [];
-
-const PARTICLES = 26000;
-
-for (let i = 0; i < PARTICLES; i++) {
-
-  // Human silhouette bias
-  let y = (Math.random() - 0.5) * 40;
-  let radius;
-
-  if (y > 10) radius = 5;         // head
-  else if (y > -8) radius = 9;    // torso
-  else radius = 7;                // lower
-
-  let angle = Math.random() * Math.PI * 2;
-  let x = Math.cos(angle) * radius * Math.random();
-  let z = Math.sin(angle) * radius * Math.random();
-
-  positions.push(x, y, z);
-
-  velocities.push(
-    0,
-    0,
-    Math.random() * 0.15 + 0.05 // backward flow
-  );
-}
-
-geometry.setAttribute(
-  "position",
-  new THREE.Float32BufferAttribute(positions, 3)
-);
-
-const material = new THREE.PointsMaterial({
-  color: 0x00ffff,
-  size: 0.35,
-  transparent: true,
-  opacity: 0.85,
-  blending: THREE.AdditiveBlending,
-  depthWrite: false
-});
-
-const avatar = new THREE.Points(geometry, material);
-scene.add(avatar);
-
-function animate() {
-  requestAnimationFrame(animate);
-
-  const pos = geometry.attributes.position.array;
-
-  for (let i = 0; i < pos.length; i += 3) {
-    pos[i + 2] += velocities[i + 2];
-
-    if (pos[i + 2] > 20) {
-      pos[i + 2] = -20;
-    }
-  }
-
-  geometry.attributes.position.needsUpdate = true;
-
-  avatar.rotation.y += 0.0015;
-  avatar.position.y = Math.sin(Date.now() * 0.001) * 0.4;
-
-  renderer.render(scene, camera);
-}
-
-animate();
-
-window.addEventListener("resize", () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-});
-</script>
-
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<title>AI Course HUD UI</title>
+<title>AI Course HUD – Final UI</title>
 
 <style>
 html, body {
@@ -220,85 +10,90 @@ html, body {
   padding: 0;
   width: 100%;
   height: 100%;
-  background: #050b12;
+  background: #02070c;
   overflow: hidden;
   font-family: "Segoe UI", Arial, sans-serif;
 }
 
-/* ===== ThreeJS container (UNCHANGED) ===== */
+/* ===== BASE SCENE (UNCHANGED) ===== */
 #three-container {
   position: fixed;
   inset: 0;
   z-index: 1;
 }
 
-/* ===== UI Overlay ===== */
+/* ===== UI OVERLAY (TOP MOST) ===== */
 #ui-overlay {
   position: fixed;
   inset: 0;
-  z-index: 10;
+  z-index: 9999;
   pointer-events: none;
 }
 
-/* ===== Floating Course Panel ===== */
+/* ===== FLOATING COURSE HUD ===== */
 .course-panel {
   position: absolute;
-  bottom: 10%;
+  bottom: 14%;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 28px;
+  gap: 34px;
   pointer-events: auto;
 }
 
-/* ===== Course Card ===== */
+/* ===== COURSE CARD ===== */
 .course-card {
-  width: 260px;
-  height: 340px;
-  padding: 22px;
-  border-radius: 18px;
-  background: linear-gradient(
-    180deg,
-    rgba(30, 160, 190, 0.25),
-    rgba(10, 40, 60, 0.35)
-  );
-  backdrop-filter: blur(14px);
-  border: 1px solid rgba(120, 220, 255, 0.35);
-  box-shadow: 0 0 35px rgba(80, 200, 255, 0.15);
-  color: #e6faff;
+  width: 270px;
+  height: 360px;
+  padding: 24px;
+  border-radius: 20px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(40, 190, 220, 0.28),
+      rgba(8, 30, 48, 0.45)
+    );
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(140, 240, 255, 0.35);
+  box-shadow:
+    0 0 45px rgba(80, 220, 255, 0.18),
+    inset 0 0 25px rgba(80, 220, 255, 0.15);
+  color: #e9fbff;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: transform 0.35s ease, box-shadow 0.35s ease;
+  transition: all 0.4s ease;
 }
 
 .course-card:hover {
-  transform: translateY(-14px) scale(1.04);
-  box-shadow: 0 0 55px rgba(120, 240, 255, 0.35);
+  transform: translateY(-16px) scale(1.05);
+  box-shadow:
+    0 0 70px rgba(120, 240, 255, 0.4),
+    inset 0 0 30px rgba(120, 240, 255, 0.3);
 }
 
-/* ===== Card Content ===== */
+/* ===== TEXT ===== */
 .course-title {
   font-size: 18px;
-  letter-spacing: 1px;
+  letter-spacing: 1.2px;
   text-transform: uppercase;
 }
 
 .course-desc {
   font-size: 13px;
-  opacity: 0.8;
-  line-height: 1.4;
+  opacity: 0.85;
+  line-height: 1.5;
   margin-top: 10px;
 }
 
-/* ===== Progress ===== */
+/* ===== PROGRESS ===== */
 .progress {
-  margin-top: 16px;
+  margin-top: 18px;
 }
 
 .progress-label {
   font-size: 12px;
-  opacity: 0.7;
+  opacity: 0.75;
 }
 
 .progress-bar {
@@ -307,16 +102,16 @@ html, body {
   border-radius: 6px;
   background: rgba(255,255,255,0.15);
   overflow: hidden;
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
 .progress-fill {
   height: 100%;
   width: 50%;
-  background: linear-gradient(90deg, #6ff, #1ec9ff);
+  background: linear-gradient(90deg, #7ff, #22d6ff);
 }
 
-/* ===== Locked Card ===== */
+/* ===== LOCKED ===== */
 .locked {
   opacity: 0.45;
 }
@@ -325,54 +120,60 @@ html, body {
   width: 0%;
 }
 
-/* ===== CTA ===== */
+/* ===== BUTTON ===== */
 .course-btn {
-  margin-top: 18px;
-  padding: 10px;
-  border-radius: 10px;
-  background: rgba(120, 220, 255, 0.2);
-  border: 1px solid rgba(120, 220, 255, 0.4);
-  color: #e6faff;
+  margin-top: 22px;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(120, 220, 255, 0.22);
+  border: 1px solid rgba(140, 240, 255, 0.45);
+  color: #eaffff;
   text-align: center;
   font-size: 13px;
-  letter-spacing: 1px;
+  letter-spacing: 1.2px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- ===== Existing Scene (DO NOT TOUCH) ===== -->
+<!-- ===== BACKGROUND / THREEJS (DO NOT MODIFY) ===== -->
 <div id="three-container">
-  <!-- Your existing ThreeJS / background code stays here -->
+  <!-- Your existing ThreeJS / environment code stays here -->
 </div>
 
-<!-- ===== UI Overlay ===== -->
+<!-- ===== FLOATING UI ===== -->
 <div id="ui-overlay">
+
   <div class="course-panel">
 
+    <!-- COURSE 1 -->
     <div class="course-card">
       <div>
         <div class="course-title">AI Foundations</div>
         <div class="course-desc">
-          Understand AI basics, mindset, tools & workflows.
+          AI mindset, tools, workflows & system thinking.
         </div>
+
         <div class="progress">
-          <div class="progress-label">Progress: 50%</div>
+          <div class="progress-label">Progress · 50%</div>
           <div class="progress-bar">
             <div class="progress-fill"></div>
           </div>
         </div>
       </div>
+
       <div class="course-btn">ENTER MODULE</div>
     </div>
 
+    <!-- COURSE 2 -->
     <div class="course-card locked">
       <div>
         <div class="course-title">AI Creation</div>
         <div class="course-desc">
-          Build real AI products, bots, automations.
+          Build AI apps, bots, agents & automations.
         </div>
+
         <div class="progress">
           <div class="progress-label">Locked</div>
           <div class="progress-bar">
@@ -380,15 +181,18 @@ html, body {
           </div>
         </div>
       </div>
+
       <div class="course-btn">LOCKED</div>
     </div>
 
+    <!-- COURSE 3 -->
     <div class="course-card locked">
       <div>
         <div class="course-title">AI Monetization</div>
         <div class="course-desc">
           Turn AI skills into scalable income systems.
         </div>
+
         <div class="progress">
           <div class="progress-label">Locked</div>
           <div class="progress-bar">
@@ -396,6 +200,7 @@ html, body {
           </div>
         </div>
       </div>
+
       <div class="course-btn">LOCKED</div>
     </div>
 
