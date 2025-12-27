@@ -107,6 +107,7 @@ async function speak(text) {
 
     const data = await res.json();
     replyBox.innerText = "JARVIS: " + data.reply;
+speak(data.reply);
   } catch (e) {
     replyBox.innerText = "JARVIS: Backend not responding.";
   }
@@ -115,4 +116,5 @@ async function speak(text) {
 
 </body>
 </html>
+
 
