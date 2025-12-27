@@ -1,173 +1,200 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
 <title>AI Command Center</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- THREE.JS -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
 
 <style>
-/* ===== RESET ===== */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Segoe UI", Tahoma, sans-serif;
+*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Tahoma}
+
+body{
+  background:#000;
+  color:#00ffff;
+  overflow:hidden;
 }
 
-/* ===== BODY ===== */
-body {
-  height: 100vh;
-  background: radial-gradient(circle at center, #001a1a, #000);
-  color: #00ffff;
-  overflow: hidden;
+/* HUD */
+.container{
+  position:absolute;
+  top:5%;
+  left:50%;
+  transform:translateX(-50%);
+  width:90%;
+  max-width:900px;
+  padding:20px;
+  border:1px solid #00ffff;
+  box-shadow:0 0 25px #00ffffaa;
+  backdrop-filter:blur(6px);
+  z-index:5;
 }
 
-/* ===== AVATAR BACKGROUND ===== */
-.avatar-bg {
-  position: fixed;
-  inset: 0;
-  background-image: url("avatar.jpg");
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  opacity: 0.25;
-  filter: blur(1.5px) brightness(1.2);
-  z-index: -2;
-  animation: float 6s ease-in-out infinite;
+.header{
+  text-align:center;
+  font-size:26px;
+  letter-spacing:3px;
+  margin-bottom:20px;
 }
 
-/* ===== SCANLINES ===== */
-.scanlines {
-  position: fixed;
-  inset: 0;
-  background: repeating-linear-gradient(
-    to bottom,
-    rgba(0,255,255,0.03),
-    rgba(0,255,255,0.03) 1px,
-    transparent 2px,
-    transparent 4px
-  );
-  pointer-events: none;
-  z-index: -1;
+.panel{
+  border:1px solid #00ffff;
+  padding:15px;
+  margin-bottom:15px;
+  box-shadow:inset 0 0 12px #00ffff55;
 }
 
-/* ===== MAIN CONTAINER ===== */
-.container {
-  width: 90%;
-  max-width: 900px;
-  margin: 6vh auto;
-  padding: 25px;
-  border: 1px solid #00ffff;
-  box-shadow: 0 0 25px rgba(0,255,255,0.6);
-  backdrop-filter: blur(6px);
+.chat{
+  display:flex;
+  gap:10px;
+}
+.chat input{
+  flex:1;
+  background:#000;
+  border:1px solid #00ffff;
+  color:#00ffff;
+  padding:10px;
+}
+.chat button{
+  background:#00ffff;
+  color:#000;
+  font-weight:bold;
+  border:none;
+  padding:10px 20px;
+  cursor:pointer;
 }
 
-/* ===== HEADER ===== */
-.header {
-  text-align: center;
-  font-size: 26px;
-  letter-spacing: 3px;
-  margin-bottom: 20px;
-}
+.status{margin-top:8px;font-size:13px}
 
-/* ===== PANELS ===== */
-.panel {
-  border: 1px solid #00ffff;
-  padding: 15px;
-  margin-bottom: 20px;
-  box-shadow: inset 0 0 12px rgba(0,255,255,0.4);
-}
-
-/* ===== TITLES ===== */
-.panel h3 {
-  margin-bottom: 10px;
-  font-size: 14px;
-  text-transform: uppercase;
-}
-
-/* ===== LIST ===== */
-.panel ul {
-  list-style: none;
-}
-.panel li {
-  margin: 6px 0;
-}
-
-/* ===== CHAT ===== */
-.chat-box {
-  display: flex;
-  gap: 10px;
-}
-
-.chat-box input {
-  flex: 1;
-  padding: 10px;
-  background: black;
-  border: 1px solid #00ffff;
-  color: #00ffff;
-  outline: none;
-}
-
-.chat-box button {
-  padding: 10px 18px;
-  background: #00ffff;
-  border: none;
-  color: black;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.status {
-  margin-top: 10px;
-  font-size: 13px;
-  opacity: 0.8;
-}
-
-/* ===== ANIMATIONS ===== */
-@keyframes float {
-  0% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-  100% { transform: translateY(0); }
+/* Three canvas */
+canvas{
+  position:fixed;
+  inset:0;
+  z-index:1;
 }
 </style>
 </head>
 
 <body>
 
-<!-- BACKGROUND -->
-<div class="avatar-bg"></div>
-<div class="scanlines"></div>
-
 <!-- UI -->
 <div class="container">
-
   <div class="header">AI COMMAND CENTER</div>
 
-  <div class="panel">
-    <h3>User Memory</h3>
-    Joined AI Evolution Program. Status: <b>ACTIVE</b>
+  <div class="panel" id="memoryPanel">
+    User Memory: Initializing...
   </div>
 
   <div class="panel">
-    <h3>Training Modules</h3>
-    <ul>
-      <li>AI Foundations — <b>UNLOCKED</b></li>
-      <li>Prompt Engineering — <b>UNLOCKED</b></li>
-      <li>Automation Systems — <b>LOCKED</b></li>
-      <li>AI Business Models — <b>LOCKED</b></li>
-    </ul>
+    <b>Training Modules</b><br>
+    AI Foundations — <span id="m1"></span><br>
+    Prompt Engineering — <span id="m2"></span><br>
+    Automation Systems — <span id="m3"></span><br>
   </div>
 
   <div class="panel">
-    <h3>Talk to JARVIS</h3>
-    <div class="chat-box">
-      <input type="text" placeholder="Type command..." />
-      <button>ASK</button>
+    <b>Talk to JARVIS</b>
+    <div class="chat">
+      <input id="userInput" placeholder="Speak or type command">
+      <button onclick="askJarvis()">ASK</button>
     </div>
-    <div class="status">JARVIS: Standby mode.</div>
+    <div class="status" id="status">JARVIS: Standby.</div>
   </div>
-
 </div>
+
+<!-- THREE.JS -->
+<script>
+/* ========== 3D PARTICLE HEAD ========== */
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,0.1,1000);
+camera.position.z=70;
+
+const renderer=new THREE.WebGLRenderer({alpha:true});
+renderer.setSize(innerWidth,innerHeight);
+document.body.appendChild(renderer.domElement);
+
+// Particle head (sphere approximation)
+const geometry=new THREE.SphereGeometry(25,64,64);
+const material=new THREE.PointsMaterial({
+  color:0x00ffff,
+  size:0.6,
+  transparent:true,
+  opacity:0.85
+});
+const head=new THREE.Points(geometry,material);
+scene.add(head);
+
+function animate(){
+  requestAnimationFrame(animate);
+  head.rotation.y+=0.002;
+  head.rotation.x+=0.001;
+  renderer.render(scene,camera);
+}
+animate();
+
+window.onresize=()=>{
+  camera.aspect=innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+};
+</script>
+
+<script>
+/* ========== MEMORY SYSTEM ========== */
+let memory=JSON.parse(localStorage.getItem("jarvisMemory"))||{
+  interactions:0,
+  modules:{
+    foundation:true,
+    prompt:true,
+    automation:false
+  }
+};
+
+function saveMemory(){
+  localStorage.setItem("jarvisMemory",JSON.stringify(memory));
+  renderMemory();
+}
+
+function renderMemory(){
+  document.getElementById("memoryPanel").innerHTML=
+    `Interactions: ${memory.interactions}`;
+  m1.innerText=memory.modules.foundation?"UNLOCKED":"LOCKED";
+  m2.innerText=memory.modules.prompt?"UNLOCKED":"LOCKED";
+  m3.innerText=memory.modules.automation?"UNLOCKED":"LOCKED";
+}
+renderMemory();
+
+/* ========== VOICE ENGINE ========== */
+function speak(text){
+  const u=new SpeechSynthesisUtterance(text);
+  u.rate=0.95;
+  u.pitch=0.8;
+  u.voice=speechSynthesis.getVoices().find(v=>v.name.includes("Male"))||null;
+  speechSynthesis.speak(u);
+}
+
+/* ========== AI LOGIC (LOCAL) ========== */
+function askJarvis(){
+  const input=userInput.value.trim();
+  if(!input)return;
+
+  memory.interactions++;
+
+  let response="Acknowledged.";
+
+  if(memory.interactions>3){
+    memory.modules.automation=true;
+    response="Automation Systems unlocked. You are progressing well.";
+  }
+
+  document.getElementById("status").innerText="JARVIS: "+response;
+  speak(response);
+  saveMemory();
+  userInput.value="";
+}
+</script>
 
 </body>
 </html>
