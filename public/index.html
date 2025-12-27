@@ -1,151 +1,249 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>AI Command Center</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>JARVIS | AI Command Center</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    body {
-      margin: 0;
-      background: radial-gradient(circle at center, #02131a, #000);
-      color: #00ffff;
-      font-family: Arial, sans-serif;
-    }
+<!-- THREE.JS -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
 
-    .container {
-      max-width: 900px;
-      margin: 40px auto;
-      border: 1px solid #00ffff;
-      padding: 20px;
-      box-shadow: 0 0 30px #00ffff33;
-    }
+<style>
+/* ================= BASE ================= */
+* { margin:0; padding:0; box-sizing:border-box; font-family: "Segoe UI", sans-serif; }
+body {
+  background: radial-gradient(circle at center, #06121f 0%, #020409 70%);
+  color:#9ffcff;
+  overflow:hidden;
+}
 
-    h1 {
-      text-align: center;
-      letter-spacing: 2px;
-    }
+/* ================= SCANLINES ================= */
+body::after {
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0,255,255,0.03),
+    rgba(0,255,255,0.03) 1px,
+    transparent 2px,
+    transparent 4px
+  );
+  z-index:1000;
+}
 
-    .memory, .modules, .chat {
-      margin-top: 25px;
-      padding: 15px;
-      border: 1px solid #00ffff55;
-    }
+/* ================= INTRO ================= */
+#intro {
+  position:fixed;
+  inset:0;
+  background:linear-gradient(180deg,#020409,#071a2d);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:999;
+}
+#introBox {
+  text-align:center;
+  animation:fadeIn 2s ease;
+}
+#intro h1 {
+  font-size:2.4rem;
+  letter-spacing:4px;
+}
+#intro p {
+  opacity:.7;
+  margin-top:12px;
+}
+#intro button {
+  margin-top:30px;
+  padding:14px 42px;
+  background:transparent;
+  border:1px solid #00f6ff;
+  color:#00f6ff;
+  cursor:pointer;
+}
+#intro button:hover {
+  background:#00f6ff;
+  color:#000;
+}
 
-    input {
-      width: 80%;
-      padding: 10px;
-      background: black;
-      border: 1px solid #00ffff;
-      color: #00ffff;
-    }
+/* ================= HUD ================= */
+#hud {
+  display:none;
+  position:relative;
+  width:100vw;
+  height:100vh;
+}
 
-    button {
-      padding: 10px 20px;
-      background: #00ffff;
-      border: none;
-      cursor: pointer;
-    }
+/* ================= CENTER CORE ================= */
+#coreWrapper {
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:340px;
+  height:340px;
+}
 
-    #reply {
-      margin-top: 15px;
-      min-height: 40px;
-    }
-  </style>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+.ring {
+  position:absolute;
+  border-radius:50%;
+  border:1px solid #00f6ff33;
+  animation:spin linear infinite;
+}
+#ring1 { inset:0; animation-duration:24s; }
+#ring2 { inset:30px; animation-duration:40s; border-style:dashed; }
+#ring3 { inset:60px; animation-duration:14s; }
 
+#label {
+  position:absolute;
+  inset:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  letter-spacing:6px;
+  font-size:1.1rem;
+  pointer-events:none;
+}
+
+/* ================= AVATAR ================= */
+#avatar {
+  position:absolute;
+  inset:80px;
+}
+
+/* ================= PANELS ================= */
+.panel {
+  position:absolute;
+  width:300px;
+  height:100%;
+  top:0;
+  background:rgba(5,25,40,.5);
+  border-right:1px solid #00f6ff22;
+  padding:20px;
+}
+#leftPanel { left:0; }
+#rightPanel {
+  right:0;
+  border-left:1px solid #00f6ff22;
+  border-right:none;
+}
+
+.panel h3 {
+  margin-bottom:10px;
+  letter-spacing:2px;
+}
+
+/* ================= RADAR ================= */
+#radar {
+  position:absolute;
+  bottom:30px;
+  left:30px;
+  width:140px;
+  height:140px;
+  border-radius:50%;
+  border:1px solid #00f6ff55;
+}
+#radar::before {
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:50%;
+  background:conic-gradient(
+    from 0deg,
+    rgba(0,255,255,.6),
+    rgba(0,255,255,0) 60%
+  );
+  animation:spin 3s linear infinite;
+}
+
+/* ================= ANIM ================= */
+@keyframes spin {
+  from { transform:rotate(0deg); }
+  to { transform:rotate(360deg); }
+}
+@keyframes fadeIn {
+  from { opacity:0; transform:scale(.95); }
+  to { opacity:1; transform:scale(1); }
+}
+</style>
 </head>
+
 <body>
 
-  <div class="container">
-    <h1>AI COMMAND CENTER</h1>
+<!-- INTRO -->
+<div id="intro">
+  <div id="introBox">
+    <h1>WELCOME TO THE AI EVOLUTION</h1>
+    <p>You are initializing a future intelligence</p>
+    <button onclick="start()">INITIALIZE JARVIS</button>
+  </div>
+</div>
 
-    <div class="memory">
-      <strong>User Memory</strong><br>
-      Joined AI Evolution Program. Status: ACTIVE
-    </div>
-    <div id="memoryGraph" style="margin-top:15px;"></div>
-    <div class="modules">
-      <strong>Training Modules</strong>
-      <ul>
-        <li>AI Foundations – UNLOCKED</li>
-        <li>Prompt Engineering – UNLOCKED</li>
-        <li>Automation Systems – LOCKED</li>
-        <li>AI Business Models – LOCKED</li>
-      </ul>
-    </div>
+<!-- HUD -->
+<div id="hud">
 
-    <div class="chat">
-      <div id="avatar" style="height:300px;"></div>
-      <strong>Talk to JARVIS</strong><br><br>
-      <input id="msg" placeholder="Ask Jarvis..." />
-      <button onclick="send()">ASK</button>
-      <div id="reply"></div>
-    </div>
+  <!-- PANELS -->
+  <div id="leftPanel" class="panel">
+    <h3>USER STATUS</h3>
+    Neural Link: STANDBY<br>
+    Memory Core: EMPTY<br>
+    Evolution Stage: HUMAN
   </div>
 
+  <div id="rightPanel" class="panel">
+    <h3>COURSE MATRIX</h3>
+    ▣ AI Foundations (UNLOCKED)<br>
+    ▢ AI Automation (LOCKED)<br>
+    ▢ AI Income Systems (LOCKED)
+  </div>
+
+  <!-- CORE -->
+  <div id="coreWrapper">
+    <div id="ring1" class="ring"></div>
+    <div id="ring2" class="ring"></div>
+    <div id="ring3" class="ring"></div>
+    <div id="avatar"></div>
+    <div id="label">J A R V I S</div>
+  </div>
+
+  <!-- RADAR -->
+  <div id="radar"></div>
+
+</div>
+
 <script>
-async function send()<script>
-async function speak(text) {
-  const res = await fetch("/api/voice", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text })
-  });
-
-  const audioBlob = await res.blob();
-  const audioUrl = URL.createObjectURL(audioBlob);
-  const audio = new Audio(audioUrl);
-  audio.play();
-  const input = document.getElementById("msg").value;
-  const replyBox = document.getElementById("reply");
-  replyBox.innerText = "JARVIS: Thinking...";
-
-  try {
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: input })
-    });
-
-    const data = await res.json();
-    replyBox.innerText = "JARVIS: " + data.reply;
-speak(data.reply);
-  } catch (e) {
-    replyBox.innerText = "JARVIS: Backend not responding.";
-  }
+function start(){
+  document.getElementById("intro").style.display="none";
+  document.getElementById("hud").style.display="block";
 }
-</script>
-  <script>
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / 300, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer({ alpha: true });
 
-renderer.setSize(window.innerWidth * 0.8, 300);
+/* ========== THREE.JS AVATAR ========== */
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(60,1,0.1,1000);
+const renderer = new THREE.WebGLRenderer({alpha:true, antialias:true});
+renderer.setSize(180,180);
 document.getElementById("avatar").appendChild(renderer.domElement);
 
-const geometry = new THREE.SphereGeometry(1.2, 32, 32);
+const geometry = new THREE.IcosahedronGeometry(1.1, 1);
 const material = new THREE.MeshBasicMaterial({
-  wireframe: true,
-  color: 0x00ffff
+  color:0x00ffff,
+  wireframe:true
 });
-const sphere = new THREE.Mesh(geometry, material);
-scene.add(sphere);
+const orb = new THREE.Mesh(geometry, material);
+scene.add(orb);
 
 camera.position.z = 3;
 
-function animate() {
+function animate(){
   requestAnimationFrame(animate);
-  sphere.rotation.y += 0.01;
-  sphere.rotation.x += 0.005;
+  orb.rotation.x += 0.004;
+  orb.rotation.y += 0.006;
   renderer.render(scene, camera);
 }
 animate();
 </script>
 
-
 </body>
 </html>
-
-
-
