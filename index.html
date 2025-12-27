@@ -1,31 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
 <title>AI Command Center</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- FONT -->
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
 html, body {
   margin: 0;
   padding: 0;
-  background: black;
-  color: #00ffff;
-  font-family: 'Orbitron', sans-serif;
+  background: #000;
+  font-family: Orbitron, sans-serif;
   overflow: hidden;
+  color: #00ffff;
 }
 
-/* THREE.JS CANVAS */
-#avatarCanvas {
+#threeCanvas {
   position: fixed;
   inset: 0;
   z-index: 1;
 }
 
-/* HUD CONTAINER */
 .hud {
   position: relative;
   z-index: 5;
@@ -34,60 +31,47 @@ html, body {
   margin: 40px auto;
   padding: 20px;
   border: 1px solid #00ffff;
-  box-shadow: 0 0 25px rgba(0,255,255,0.4);
   background: rgba(0,0,0,0.55);
-  backdrop-filter: blur(8px);
+  box-shadow: 0 0 30px rgba(0,255,255,0.5);
+  backdrop-filter: blur(10px);
 }
 
-/* TITLE */
-.hud h1 {
+h1 {
   text-align: center;
   letter-spacing: 4px;
-  margin-bottom: 20px;
 }
 
-/* PANELS */
 .panel {
   border: 1px solid #00ffff;
   padding: 15px;
   margin-bottom: 15px;
 }
 
-/* INPUT */
 input {
-  width: 80%;
+  width: 75%;
   padding: 10px;
   background: black;
   border: 1px solid #00ffff;
   color: #00ffff;
-  outline: none;
 }
 
 button {
   padding: 10px 20px;
-  margin-left: 10px;
   background: #00ffff;
-  border: none;
   color: black;
-  font-weight: bold;
+  border: none;
   cursor: pointer;
+  margin-left: 10px;
 }
 
-.status {
-  margin-top: 10px;
-  font-size: 14px;
-  opacity: 0.8;
-}
-
-/* SCANLINE EFFECT */
 .scanlines::before {
   content: "";
   position: fixed;
   inset: 0;
   background: repeating-linear-gradient(
     to bottom,
-    rgba(0,255,255,0.05),
-    rgba(0,255,255,0.05) 1px,
+    rgba(0,255,255,0.04),
+    rgba(0,255,255,0.04) 1px,
     transparent 1px,
     transparent 3px
   );
@@ -99,91 +83,122 @@ button {
 
 <body class="scanlines">
 
-<!-- THREE JS CANVAS -->
-<canvas id="avatarCanvas"></canvas>
+<canvas id="threeCanvas"></canvas>
 
-<!-- HUD UI -->
 <div class="hud">
   <h1>AI COMMAND CENTER</h1>
 
   <div class="panel">
-    <strong>User Memory</strong><br>
     Evolution Program: ACTIVE<br>
     Interactions: 2
   </div>
 
   <div class="panel">
-    <strong>Training Modules</strong><br>
     AI Foundations — UNLOCKED<br>
     Prompt Engineering — UNLOCKED<br>
     Automation Systems — LOCKED
   </div>
 
   <div class="panel">
-    <strong>Talk to JARVIS</strong><br><br>
-    <input placeholder="Speak or type command" />
+    Talk to JARVIS<br><br>
+    <input placeholder="Speak or type command">
     <button>ASK</button>
-    <div class="status">JARVIS: Standby mode.</div>
+    <div style="margin-top:10px;font-size:13px;">JARVIS: Online.</div>
   </div>
 </div>
 
-<!-- THREE.JS -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
 
 <script>
-/* BASIC SCENE */
-const canvas = document.getElementById("avatarCanvas");
+const canvas = document.getElementById("threeCanvas");
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
-camera.position.z = 60;
 
-const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+const camera = new THREE.PerspectiveCamera(
+  50,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  1000
+);
+camera.position.z = 70;
+
+const renderer = new THREE.WebGLRenderer({
+  canvas,
+  alpha: true,
+  antialias: true
+});
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
 
-/* PARTICLE HUMAN FIGURE */
-const points = [];
+// PARTICLE AVATAR
 const geometry = new THREE.BufferGeometry();
+const positions = [];
+const velocities = [];
 
-/* Generate human silhouette using math */
-for (let i = 0; i < 18000; i++) {
-  let y = Math.random() * 40 - 20;
+const PARTICLES = 26000;
+
+for (let i = 0; i < PARTICLES; i++) {
+
+  // Human silhouette bias
+  let y = (Math.random() - 0.5) * 40;
   let radius;
 
-  if (y > 8) radius = 6;         // head
-  else if (y > -10) radius = 9;  // torso
-  else radius = 7;               // lower body
+  if (y > 10) radius = 5;         // head
+  else if (y > -8) radius = 9;    // torso
+  else radius = 7;                // lower
 
   let angle = Math.random() * Math.PI * 2;
   let x = Math.cos(angle) * radius * Math.random();
   let z = Math.sin(angle) * radius * Math.random();
 
-  points.push(x, y, z);
+  positions.push(x, y, z);
+
+  velocities.push(
+    0,
+    0,
+    Math.random() * 0.15 + 0.05 // backward flow
+  );
 }
 
-geometry.setAttribute('position', new THREE.Float32BufferAttribute(points, 3));
+geometry.setAttribute(
+  "position",
+  new THREE.Float32BufferAttribute(positions, 3)
+);
 
 const material = new THREE.PointsMaterial({
   color: 0x00ffff,
   size: 0.35,
   transparent: true,
-  opacity: 0.85
+  opacity: 0.85,
+  blending: THREE.AdditiveBlending,
+  depthWrite: false
 });
 
 const avatar = new THREE.Points(geometry, material);
 scene.add(avatar);
 
-/* ANIMATION */
 function animate() {
   requestAnimationFrame(animate);
-  avatar.rotation.y += 0.002;
-  avatar.position.y = Math.sin(Date.now() * 0.001) * 0.5;
+
+  const pos = geometry.attributes.position.array;
+
+  for (let i = 0; i < pos.length; i += 3) {
+    pos[i + 2] += velocities[i + 2];
+
+    if (pos[i + 2] > 20) {
+      pos[i + 2] = -20;
+    }
+  }
+
+  geometry.attributes.position.needsUpdate = true;
+
+  avatar.rotation.y += 0.0015;
+  avatar.position.y = Math.sin(Date.now() * 0.001) * 0.4;
+
   renderer.render(scene, camera);
 }
 
 animate();
 
-/* RESPONSIVE */
 window.addEventListener("resize", () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
