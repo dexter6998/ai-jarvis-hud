@@ -82,7 +82,18 @@
   </div>
 
 <script>
-async function send() {
+async function send()<script>
+async function speak(text) {
+  const res = await fetch("/api/voice", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text })
+  });
+
+  const audioBlob = await res.blob();
+  const audioUrl = URL.createObjectURL(audioBlob);
+  const audio = new Audio(audioUrl);
+  audio.play();
   const input = document.getElementById("msg").value;
   const replyBox = document.getElementById("reply");
   replyBox.innerText = "JARVIS: Thinking...";
@@ -104,3 +115,4 @@ async function send() {
 
 </body>
 </html>
+
