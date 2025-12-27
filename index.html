@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI Command Center</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Orbitron,Segoe UI}
+body{
+  background:#02070b;
+  color:#00f6ff;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+/* FRAME */
+#frame{
+  width:80%;
+  border:2px solid #00f6ff;
+  padding:30px;
+  box-shadow:0 0 40px rgba(0,246,255,.4);
+}
+
+/* TITLE */
+h1{
+  text-align:center;
+  letter-spacing:4px;
+  margin-bottom:25px;
+}
+
+/* SECTIONS */
+.section{
+  border:1px solid #00f6ff;
+  padding:15px;
+  margin-bottom:18px;
+}
+
+/* MODULES */
+ul{list-style:none}
+li{margin:6px 0}
+
+/* INPUT */
+#chat{
+  display:flex;
+  gap:10px;
+}
+input{
+  flex:1;
+  padding:10px;
+  background:black;
+  border:1px solid #00f6ff;
+  color:#00f6ff;
+}
+button{
+  padding:10px 20px;
+  background:#00f6ff;
+  border:none;
+  cursor:pointer;
+}
+
+/* BACKGROUND AVATAR */
+#bg{
+  position:fixed;
+  inset:0;
+  background:url("https://i.imgur.com/0VfEw6F.jpg") center/cover no-repeat;
+  filter:blur(8px) brightness(.35);
+  z-index:-1;
+}
+</style>
+</head>
+
+<body>
+
+<div id="bg"></div>
+
+<div id="frame">
+  <h1>AI COMMAND CENTER</h1>
+
+  <div class="section">
+    <strong>User Memory</strong><br>
+    Joined AI Evolution Program. Status: ACTIVE
+  </div>
+
+  <div class="section">
+    <strong>Training Modules</strong>
+    <ul>
+      <li>AI Foundations — UNLOCKED</li>
+      <li>Prompt Engineering — UNLOCKED</li>
+      <li>Automation Systems — LOCKED</li>
+      <li>AI Business Models — LOCKED</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <strong>Talk to JARVIS</strong>
+    <div id="chat">
+      <input placeholder="Type command..." />
+      <button>ASK</button>
+    </div>
+    <p style="margin-top:8px;opacity:.7">JARVIS: Standby mode.</p>
+  </div>
+</div>
+
+</body>
+</html>
