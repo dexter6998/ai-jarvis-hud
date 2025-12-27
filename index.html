@@ -1,107 +1,172 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <title>AI Command Center</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Orbitron,Segoe UI}
-body{
-  background:#02070b;
-  color:#00f6ff;
-  height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
+/* ===== RESET ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, sans-serif;
 }
 
-/* FRAME */
-#frame{
-  width:80%;
-  border:2px solid #00f6ff;
-  padding:30px;
-  box-shadow:0 0 40px rgba(0,246,255,.4);
+/* ===== BODY ===== */
+body {
+  height: 100vh;
+  background: radial-gradient(circle at center, #001a1a, #000);
+  color: #00ffff;
+  overflow: hidden;
 }
 
-/* TITLE */
-h1{
-  text-align:center;
-  letter-spacing:4px;
-  margin-bottom:25px;
+/* ===== AVATAR BACKGROUND ===== */
+.avatar-bg {
+  position: fixed;
+  inset: 0;
+  background-image: url("avatar.jpg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.25;
+  filter: blur(1.5px) brightness(1.2);
+  z-index: -2;
+  animation: float 6s ease-in-out infinite;
 }
 
-/* SECTIONS */
-.section{
-  border:1px solid #00f6ff;
-  padding:15px;
-  margin-bottom:18px;
+/* ===== SCANLINES ===== */
+.scanlines {
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0,255,255,0.03),
+    rgba(0,255,255,0.03) 1px,
+    transparent 2px,
+    transparent 4px
+  );
+  pointer-events: none;
+  z-index: -1;
 }
 
-/* MODULES */
-ul{list-style:none}
-li{margin:6px 0}
-
-/* INPUT */
-#chat{
-  display:flex;
-  gap:10px;
-}
-input{
-  flex:1;
-  padding:10px;
-  background:black;
-  border:1px solid #00f6ff;
-  color:#00f6ff;
-}
-button{
-  padding:10px 20px;
-  background:#00f6ff;
-  border:none;
-  cursor:pointer;
+/* ===== MAIN CONTAINER ===== */
+.container {
+  width: 90%;
+  max-width: 900px;
+  margin: 6vh auto;
+  padding: 25px;
+  border: 1px solid #00ffff;
+  box-shadow: 0 0 25px rgba(0,255,255,0.6);
+  backdrop-filter: blur(6px);
 }
 
-/* BACKGROUND AVATAR */
-#bg{
-  position:fixed;
-  inset:0;
-  background:url("https://i.imgur.com/0VfEw6F.jpg") center/cover no-repeat;
-  filter:blur(8px) brightness(.35);
-  z-index:-1;
+/* ===== HEADER ===== */
+.header {
+  text-align: center;
+  font-size: 26px;
+  letter-spacing: 3px;
+  margin-bottom: 20px;
+}
+
+/* ===== PANELS ===== */
+.panel {
+  border: 1px solid #00ffff;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: inset 0 0 12px rgba(0,255,255,0.4);
+}
+
+/* ===== TITLES ===== */
+.panel h3 {
+  margin-bottom: 10px;
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+/* ===== LIST ===== */
+.panel ul {
+  list-style: none;
+}
+.panel li {
+  margin: 6px 0;
+}
+
+/* ===== CHAT ===== */
+.chat-box {
+  display: flex;
+  gap: 10px;
+}
+
+.chat-box input {
+  flex: 1;
+  padding: 10px;
+  background: black;
+  border: 1px solid #00ffff;
+  color: #00ffff;
+  outline: none;
+}
+
+.chat-box button {
+  padding: 10px 18px;
+  background: #00ffff;
+  border: none;
+  color: black;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.status {
+  margin-top: 10px;
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes float {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0); }
 }
 </style>
 </head>
 
 <body>
 
-<div id="bg"></div>
+<!-- BACKGROUND -->
+<div class="avatar-bg"></div>
+<div class="scanlines"></div>
 
-<div id="frame">
-  <h1>AI COMMAND CENTER</h1>
+<!-- UI -->
+<div class="container">
 
-  <div class="section">
-    <strong>User Memory</strong><br>
-    Joined AI Evolution Program. Status: ACTIVE
+  <div class="header">AI COMMAND CENTER</div>
+
+  <div class="panel">
+    <h3>User Memory</h3>
+    Joined AI Evolution Program. Status: <b>ACTIVE</b>
   </div>
 
-  <div class="section">
-    <strong>Training Modules</strong>
+  <div class="panel">
+    <h3>Training Modules</h3>
     <ul>
-      <li>AI Foundations — UNLOCKED</li>
-      <li>Prompt Engineering — UNLOCKED</li>
-      <li>Automation Systems — LOCKED</li>
-      <li>AI Business Models — LOCKED</li>
+      <li>AI Foundations — <b>UNLOCKED</b></li>
+      <li>Prompt Engineering — <b>UNLOCKED</b></li>
+      <li>Automation Systems — <b>LOCKED</b></li>
+      <li>AI Business Models — <b>LOCKED</b></li>
     </ul>
   </div>
 
-  <div class="section">
-    <strong>Talk to JARVIS</strong>
-    <div id="chat">
-      <input placeholder="Type command..." />
+  <div class="panel">
+    <h3>Talk to JARVIS</h3>
+    <div class="chat-box">
+      <input type="text" placeholder="Type command..." />
       <button>ASK</button>
     </div>
-    <p style="margin-top:8px;opacity:.7">JARVIS: Standby mode.</p>
+    <div class="status">JARVIS: Standby mode.</div>
   </div>
+
 </div>
 
 </body>
